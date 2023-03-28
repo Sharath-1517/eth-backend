@@ -1,27 +1,14 @@
 const fs = require('fs');
 const ethers = require('ethers');
+require('dotenv').config();
 
-const walletKey = () => {
-  const wPath = './utils/WalletConfig.json';
-  if (fs.existsSync(wPath)) {
-    const config = require('./WalletConfig.json');
-    return config.privateKey
-}
-  const wallet = ethers.Wallet.createRandom();
-  const key = wallet._signingKey();
-  fs.writeFileSync(wPath, JSON.stringify(key, undefined, 2));
-  return wallet.privateKey;
-};
-
-const address = () => new ethers.Wallet(walletKey()).address;
-
-const availableNetworks = () => Object.keys(require('./ChainConfig.json'));
+const address = () => new ethers.Wallet(process.env.PRIVATE_KEY).address;
 
 const provider = (network) =>
   new ethers.providers.JsonRpcProvider(
     require('./ChainConfig.json')[network].rpc
   );
 
-const signer = (network) => new ethers.Wallet(walletKey(), provider(network));
+const signer = (network) => new ethers.Wallet(process.env.PRIVATE_KEY, provider(network));
 
-module.exports = { address, availableNetworks, provider, signer };
+module.exports = { address, provider, signer };
